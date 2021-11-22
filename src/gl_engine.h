@@ -12,5 +12,5 @@ private:
 
 private:
     struct GLFWwindow* _window;
-
+    bool _wireframe = false;
 };
