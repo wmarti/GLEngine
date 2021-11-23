@@ -7,10 +7,11 @@ which is the cause for several frustrating errors; keep this in mind!
 
 //in vec4 vertexColor;
 in vec4 vertexPosition;
+in vec2 TexCoord;
 out vec4 FragColor;
 
-uniform vec4 ourColor; // we set this in the OpenGL code
+uniform sampler2D ourTexture;
 
 void main() {
-    FragColor = vertexPosition;
+    FragColor = texture(ourTexture, TexCoord);
 }
