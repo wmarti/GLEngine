@@ -1,8 +1,8 @@
 // These pragmas disable documentation warnings
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdocumentation"
+// #pragma clang diagnostic push
+// #pragma clang diagnostic ignored "-Wdocumentation"
 #include <GLFW/glfw3.h>
-#pragma clang diagnostic pop
+// #pragma clang diagnostic pop
 
 #include "gl_engine.h"
 

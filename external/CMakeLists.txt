@@ -14,3 +14,6 @@ target_sources(stb PRIVATE
     stb/stb_image.h)
 
 target_include_directories(stb PUBLIC stb)
+
+add_subdirectory(glfw)
+add_subdirectory(glm)
