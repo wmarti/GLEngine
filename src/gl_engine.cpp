@@ -11,6 +11,8 @@
 #include "gl_engine.h"
 #include "shader.h"
 #include "texture.h"
+#include "gen_chunk.h"
+#include "timer.h"
 
 glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
@@ -20,12 +22,12 @@ float deltaTime = 0.0f;	// Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
 
 
-int width = 1600, height = 1600;
+int width = 1280, height = 720;
 bool firstMouse = true;
 float yaw = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
 float pitch = 0.0f;
-float lastX = 800.0f / 2.0;
-float lastY = 600.0 / 2.0;
+float lastX = width / 2.0;
+float lastY = height / 2.0;
 float fov = 45.0f;
 
 void GLEngine::init() {
@@ -136,8 +138,11 @@ void GLEngine::run() {
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
+    Texture grass_side("../assets/mc_grass.jpeg");
+    Texture grass_top("../assets/mc_grass_top.jpeg");
+    Texture dirt("../assets/mc_dirt.jpeg");
 
-    Texture texture("../assets/mc_grass.jpeg");
+    Block grass(&grass_top, &grass_side, &dirt);
 
     // uncomment this call to draw in wireframe polygons.
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -145,6 +150,7 @@ void GLEngine::run() {
     glEnable(GL_DEPTH_TEST);
 
     while(!glfwWindowShouldClose(_window)) {
+        Timer timer("Draw call");
         process_input(_window);
         // render
         // -----
@@ -173,7 +179,7 @@ void GLEngine::run() {
         view = lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
         glm::mat4 projection;
-        projection = glm::perspective(glm::radians(45.0f), 1600.0f / 1600.0f, 0.1f, 100.0f);
+        projection = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
 
         shaders.setMat4("transform", trans);
         shaders.setMat4("view", view);
@@ -184,12 +190,13 @@ void GLEngine::run() {
             model = glm::mat4(1.0f);
             model = glm::translate(model, cubePositions[i]);
             float angle = 20.0f * i;
-            model = glm::rotate(model, glm::radians(i%3==0 ? (float)glfwGetTime()*25.0f : angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            model = glm::rotate(
+                model, 
+                glm::radians(90.0f), // glm::radians(i%3==0 ? (float)glfwGetTime()*25.0f : angle),
+                glm::vec3(1.0f, 0.0f, 0.0f));
             shaders.setMat4("model", model);
-
-            glDrawArrays(GL_TRIANGLES, 0, 36);
+            grass.draw();
         }
-
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(_window);

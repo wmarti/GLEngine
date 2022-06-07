@@ -1,8 +1,11 @@
 add_executable(GLEngine
     main.cpp
+    gen_chunk.cpp
+    gen_chunk.h
     gl_engine.cpp
     gl_engine.h
     shader.h
+    texture.cpp
     texture.h
 )
 
