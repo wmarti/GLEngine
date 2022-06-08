@@ -5,6 +5,16 @@
 
 #include "texture.h"
 #include "vertices.h"
+#include "shader.h"
+
+enum Direction {
+    NORTH,
+    SOUTH,
+    EAST,
+    WEST,
+    UP,
+    DOWN
+};
 
 struct Block {
     Texture* p_top;
@@ -35,5 +45,6 @@ struct Block {
 };
 
 class Chunk {
-    void gen_flat_16_16();
+public:
+    void gen_flat_16_16(Block& block, Shader& shader);
 };

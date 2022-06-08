@@ -20,7 +20,7 @@ const float YAW = -90.0f;
 const float PITCH = 0.0f;
 const float SPEED = 2.5f;
 const float SENSITIVITY = 0.1f;
-const float ZOOM = 45.0f;
+const float ZOOM = 60.0f;
 
 
 // An abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL
@@ -72,12 +72,13 @@ public:
         float velocity = MovementSpeed * deltaTime;
         if (direction == FORWARD)
             Position += Front * velocity;
-        if (direction == BACKWARD)
+        else if (direction == BACKWARD)
             Position -= Front * velocity;
-        if (direction == LEFT)
+        else if (direction == LEFT)
             Position -= Right * velocity;
-        if (direction == RIGHT)
+        else if (direction == RIGHT)
             Position += Right * velocity;
+        //Position.y = 3.0f;
     }
 
     // processes input received from a mouse input system. Expects the offset value in both the x and y direction.

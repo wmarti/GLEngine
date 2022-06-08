@@ -20,13 +20,13 @@ glm::vec3 Y_AXIS = glm::vec3(0.0f, 1.0f, 0.0f);
 glm::vec3 Z_AXIS = glm::vec3(0.0f, 0.0f, 1.0f);
 
 // settings
-int width = 3840, height = 2160;
+int width = 1920, height = 1080;
 #ifdef __APPLE__
 width = 1280, height = 720;
 #endif
 
 // camera
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 3.0f, 10.0f));
 float lastX = width / 2.0f;
 float lastY = height / 2.0f;
 bool firstMouse = true;
@@ -67,65 +67,7 @@ void GLEngine::init() {
 }
 
 void GLEngine::run() {
-    Shader shaders("../shaders/shader.vert", "../shaders/shader.frag");
-    Shader shaders_yellow("../shaders/shader.vert", "../shaders/shader_yellow.frag");
-
-    float vertices[] = {
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-    };
-
-    glm::vec3 cubePositions[] = {
-        glm::vec3(0.0f,  0.0f,  0.0f),
-        glm::vec3(2.0f,  5.0f, -15.0f),
-        glm::vec3(-1.5f, -2.2f, -2.5f),
-        glm::vec3(-3.8f, -2.0f, -12.3f),
-        glm::vec3(2.4f, -0.4f, -3.5f),
-        glm::vec3(-1.7f,  3.0f, -7.5f),
-        glm::vec3(1.3f, -2.0f, -2.5f),
-        glm::vec3(1.5f,  2.0f, -2.5f),
-        glm::vec3(1.5f,  0.2f, -1.5f),
-        glm::vec3(-1.3f,  1.0f, -1.5f),
-    };
+    Shader _shaders("../shaders/shader.vert", "../shaders/shader.frag");
 
     unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
@@ -154,8 +96,14 @@ void GLEngine::run() {
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+
+
+    Chunk chunk;
 
     while(!glfwWindowShouldClose(_window)) {
+        glCullFace(GL_BACK);
+        glFrontFace(GL_CW);
         // per-frame time logic
         // --------------------
         float currentFrame = static_cast<float>(glfwGetTime());
@@ -171,7 +119,7 @@ void GLEngine::run() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // draw our first triangle
-        shaders.use();
+        _shaders.use();
 
         glm::mat4 trans = glm::mat4(1.0f);
 
@@ -180,22 +128,14 @@ void GLEngine::run() {
 
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)width / (float)height, 0.1f, 100.0f);
 
-        shaders.setMat4("transform", trans);
-        shaders.setMat4("view", view);
-        shaders.setMat4("projection", projection);
+        _shaders.setMat4("transform", trans);
+        _shaders.setMat4("view", view);
+        _shaders.setMat4("projection", projection);
         
         glBindVertexArray(VAO);
-        for (uint32_t i = 0; i < 10; i++) {
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, cubePositions[i]);
-            float angle = 20.0f * i;
-            model = glm::rotate(
-                model, 
-                glm::radians(90.0f), // glm::radians(i%3==0 ? (float)glfwGetTime()*25.0f : angle),
-                glm::vec3(1.0f, 0.0f, 0.0f));
-            shaders.setMat4("model", model);
-            grass.draw();
-        }
+        
+        chunk.gen_flat_16_16(grass, _shaders);
+
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(_window);

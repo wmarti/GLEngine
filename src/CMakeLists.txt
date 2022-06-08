@@ -7,7 +7,7 @@ add_executable(GLEngine
     shader.h
     texture.cpp
     texture.h
- "camera.h")
+ "camera.h" "shader.cpp")
 
 target_include_directories(GLEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 
