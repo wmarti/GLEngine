@@ -1,13 +1,15 @@
 add_executable(GLEngine
+    block_data.cpp
+    block_data.h
     main.cpp
     gen_chunk.cpp
     gen_chunk.h
     gl_engine.cpp
     gl_engine.h
+    shader.cpp
     shader.h
     texture.cpp
-    texture.h
- "camera.h" "shader.cpp")
+    texture.h)
 
 target_include_directories(GLEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 

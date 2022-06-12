@@ -68,23 +68,74 @@ void GLEngine::init() {
 
 void GLEngine::run() {
     Shader _shaders("../shaders/shader.vert", "../shaders/shader.frag");
+    Chunk chunk;
+    chunk.build_face_data();
+    glm::mat4 model = glm::mat4(1.0f);
+
+    glm::mat4** modelMatrices = new glm::mat4 * [6];
+    for (int i = 0; i < 6; i++) {
+        modelMatrices[i] = new glm::mat4[chunk.direction[i].size()];
+    }
+
+    for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < chunk.direction[i].size(); j++) {
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, chunk.direction[i][j]);
+            modelMatrices[i][j] = model;
+        }
+    }
 
     unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
-    // glGenBuffers(1, &EBO);
+    glGenBuffers(1, &EBO);
 
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(face_triangles), face_triangles, GL_STATIC_DRAW);
+
+
     // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+
+    //glBindBuffer(GL_ARRAY_BUFFER, 0);
+    //glBindVertexArray(0);
+
+
     // texture coord attribute
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
+    //glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    //glEnableVertexAttribArray(1);
+
+
+    // configure instanced array
+    // -------------------------
+    unsigned int buffer;
+    glGenBuffers(1, &buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, buffer);
+    glBufferData(GL_ARRAY_BUFFER, chunk.direction[0].size() * sizeof(glm::mat4), &modelMatrices[0], GL_STATIC_DRAW);
+
+    // vertex attributes
+    std::size_t vec4Size = sizeof(glm::vec4);
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)0);
+    glEnableVertexAttribArray(4);
+    glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(1 * vec4Size));
+    glEnableVertexAttribArray(5);
+    glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(2 * vec4Size));
+    glEnableVertexAttribArray(6);
+    glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(3 * vec4Size));
+
+    glVertexAttribDivisor(3, 1);
+    glVertexAttribDivisor(4, 1);
+    glVertexAttribDivisor(5, 1);
+    glVertexAttribDivisor(6, 1);
+
+    glBindVertexArray(0);
 
     Texture grass_side("../assets/mc_grass.jpeg");
     Texture grass_top("../assets/mc_grass_top.jpeg");
@@ -96,20 +147,18 @@ void GLEngine::run() {
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
 
 
-    Chunk chunk;
-
-    while(!glfwWindowShouldClose(_window)) {
-        glCullFace(GL_BACK);
-        glFrontFace(GL_CW);
+    while (!glfwWindowShouldClose(_window)) {
+        //glCullFace(GL_BACK);
+        //glFrontFace(GL_CW);
         // per-frame time logic
         // --------------------
         float currentFrame = static_cast<float>(glfwGetTime());
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-        
+
         // Timer timer("Draw call");
         process_input(_window);
         // render
@@ -117,7 +166,8 @@ void GLEngine::run() {
         // draw();
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+        //glClear(GL_COLOR_BUFFER_BIT);
+        
         // draw our first triangle
         _shaders.use();
 
@@ -131,10 +181,17 @@ void GLEngine::run() {
         _shaders.setMat4("transform", trans);
         _shaders.setMat4("view", view);
         _shaders.setMat4("projection", projection);
-        
+
         glBindVertexArray(VAO);
-        
-        chunk.gen_flat_16_16(grass, _shaders);
+
+        //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        chunk.draw_mesh(grass, _shaders);
+
+        for (int i = 0; i < 6; i++) {
+            glBindBuffer(GL_ARRAY_BUFFER, buffer);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, chunk.direction[i].size() * sizeof(glm::mat4), modelMatrices[i]);
+            glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(sizeof(GLuint) * 6 * i), chunk.direction[i].size());
+        }
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
