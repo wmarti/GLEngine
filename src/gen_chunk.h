@@ -62,5 +62,5 @@ public:
 
     Mesh* mesh;
     // Position information for each north, east, etc. face.
-    std::array<std::vector<glm::mat4>, 6> direction;
+    std::vector<std::vector<glm::vec3>> direction;
 };

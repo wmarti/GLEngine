@@ -136,23 +136,26 @@ void GLEngine::run() {
     unsigned int buffer;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glBufferData(GL_ARRAY_BUFFER, chunk.direction[0].size() * sizeof(glm::mat4), &chunk.direction[0], GL_STATIC_DRAW);
-    
+    glBufferData(GL_ARRAY_BUFFER, chunk.direction[0].size() * sizeof(glm::vec3), &chunk.direction[0], GL_STATIC_DRAW);
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribDivisor(2, 1);
+    //glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)0);
     // vertex attributes
-    std::size_t vec4Size = sizeof(glm::vec4);
-    glEnableVertexAttribArray(3);
-    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)0);
-    glEnableVertexAttribArray(4);
-    glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(1 * vec4Size));
-    glEnableVertexAttribArray(5);
-    glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(2 * vec4Size));
-    glEnableVertexAttribArray(6);
-    glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(3 * vec4Size));
+    //std::size_t vec4Size = sizeof(glm::vec4);
+    //glEnableVertexAttribArray(3);
+    //glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)0);
+    //glEnableVertexAttribArray(4);
+    //glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(1 * vec4Size));
+    //glEnableVertexAttribArray(5);
+    //glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(2 * vec4Size));
+    //glEnableVertexAttribArray(6);
+    //glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(3 * vec4Size));
 
-    glVertexAttribDivisor(3, 1);
-    glVertexAttribDivisor(4, 1);
-    glVertexAttribDivisor(5, 1);
-    glVertexAttribDivisor(6, 1);
+    //glVertexAttribDivisor(3, 1);
+    //glVertexAttribDivisor(4, 1);
+    //glVertexAttribDivisor(5, 1);
+    //glVertexAttribDivisor(6, 1);
 
     glBindVertexArray(0);
 
@@ -166,12 +169,12 @@ void GLEngine::run() {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     glEnable(GL_DEPTH_TEST);
-    //glEnable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
 
 
     while (!glfwWindowShouldClose(_window)) {
-        //glCullFace(GL_BACK);
-        //glFrontFace(GL_CW);
+        glCullFace(GL_BACK);
+        glFrontFace(GL_CW);
         // per-frame time logic
         // --------------------
         float currentFrame = static_cast<float>(glfwGetTime());
@@ -209,7 +212,7 @@ void GLEngine::run() {
         for (int i = 0; i < 6; i++) {
             glBindBuffer(GL_ARRAY_BUFFER, buffer);
             //glBufferSubData(GL_ARRAY_BUFFER, 0, chunk.direction[i].size() * sizeof(glm::mat4), &chunk.direction[i]);
-            glBufferData(GL_ARRAY_BUFFER, chunk.direction[i].size() * sizeof(glm::mat4), &chunk.direction[i][0], GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, chunk.direction[i].size() * sizeof(glm::vec3), &chunk.direction[i][0], GL_STATIC_DRAW);
             glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(sizeof(GLuint) * 6 * i), chunk.direction[i].size());
         }
 

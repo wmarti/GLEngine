@@ -48,5 +48,5 @@ public:
 		BlockCoordinate( 0, 0,-1)
 	};
 
-	std::array<short, 65536> block_data;
+	std::vector<char> block_data;
 };

@@ -4,18 +4,18 @@ void Mesh::generate_mesh() {
 	std::random_device rd; // obtain a random number from hardware
 	std::mt19937 gen(rd()); // seed the generator
 	std::uniform_int_distribution<> distr(0, 1); // define the range
-
+	block_data.resize(65536);
 	for (int height = 0; height < 256; height++) {
 		for (int row = 0; row < 16; row++) {
 			for (int col = 0; col < 16; col++) {
 				int index = (height * 16 * 16) + (row * 16) + col;
-				//block_data[index] = distr(gen);
-				if (height < 2) {
-					block_data[index] = 1;
-				}
-				else {
-					block_data[index] = 0;
-				}
+				block_data[index] = distr(gen);
+				//if (height < 256) {
+				//	block_data[index] = 1;
+				//}
+				//else {
+				//	block_data[index] = 0;
+				//}
 			}
 		}
 	}

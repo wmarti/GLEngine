@@ -4,6 +4,7 @@
 Chunk::Chunk() {
     mesh = new Mesh();
     mesh->generate_mesh();
+    direction.resize(6);
 }
 
 void Chunk::build_face_data() {
@@ -21,7 +22,7 @@ void Chunk::build_face_data() {
                     model = glm::translate(glm::mat4(1.0), glm::vec3((float)col, (float)height, (float)row));
                     // If a block has a neighbor that is 'air' in a certain direction, calculate the position of the face.
                     if (mesh->get_neighbor(row, col, height, (Direction)i) == 0) {
-                        direction[i].emplace_back(model);
+                        direction[i].emplace_back(glm::vec3((float)col, (float)height, (float)row));
                     }
                 }
             }
