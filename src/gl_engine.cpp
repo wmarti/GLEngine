@@ -71,19 +71,38 @@ void GLEngine::run() {
     Chunk chunk;
     chunk.build_face_data();
     glm::mat4 model = glm::mat4(1.0f);
+    std::vector<std::vector<glm::mat4>> modelTransforms;
+    modelTransforms.resize(6);
+    //glm::mat4** modelMatrices = new glm::mat4 * [6];
+    //for (int i = 0; i < 6; i++) {
+    //    modelMatrices[i] = new glm::mat4[chunk.direction[i].size()];
+    //}
+    //int size = 0;
+    //for (int i = 0; i < 6; i++)
+    //    size += chunk.direction[i].size();
+    //
+    //glm::mat4* modelMatrices = new glm::mat4[size];
+    //int offset = 0;
+    //for (int i = 0; i < 6; i++) {
+    //    for (int j = 0; j < chunk.direction[i].size(); j++) {
+    //        model = glm::mat4(1.0f);
+    //        model = glm::translate(model, chunk.direction[i][j]);
+    //        /*modelMatrices[i][j] = model;*/
+    //        modelTransforms[i].emplace_back(model);
+    //        //modelMatrices[offset] = model;
+    //        offset++;
+    //    }
+    //}
 
-    glm::mat4** modelMatrices = new glm::mat4 * [6];
-    for (int i = 0; i < 6; i++) {
-        modelMatrices[i] = new glm::mat4[chunk.direction[i].size()];
-    }
-
-    for (int i = 0; i < 6; i++) {
-        for (int j = 0; j < chunk.direction[i].size(); j++) {
-            model = glm::mat4(1.0f);
-            model = glm::translate(model, chunk.direction[i][j]);
-            modelMatrices[i][j] = model;
-        }
-    }
+    std::vector<size_t> offsets = {
+        {0},
+        {chunk.direction[0].size()},
+        {chunk.direction[0].size() + chunk.direction[1].size()},
+        {chunk.direction[0].size() + chunk.direction[1].size() + chunk.direction[2].size()},
+        {chunk.direction[0].size() + chunk.direction[1].size() + chunk.direction[2].size() + chunk.direction[3].size()},
+        {chunk.direction[0].size() + chunk.direction[1].size() + chunk.direction[2].size() + chunk.direction[3].size() + chunk.direction[4].size()},
+        //{chunk.direction[0].size() + chunk.direction[1].size() + chunk.direction[2].size() + chunk.direction[3].size() + chunk.direction[4].size() + chunk.direction[5].size()}
+    };
 
     unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
@@ -117,8 +136,8 @@ void GLEngine::run() {
     unsigned int buffer;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glBufferData(GL_ARRAY_BUFFER, chunk.direction[0].size() * sizeof(glm::mat4), &modelMatrices[0], GL_STATIC_DRAW);
-
+    glBufferData(GL_ARRAY_BUFFER, chunk.direction[0].size() * sizeof(glm::mat4), &chunk.direction[0], GL_STATIC_DRAW);
+    
     // vertex attributes
     std::size_t vec4Size = sizeof(glm::vec4);
     glEnableVertexAttribArray(3);
@@ -144,7 +163,7 @@ void GLEngine::run() {
     Block grass(&grass_top, &grass_side, &dirt);
 
     // uncomment this call to draw in wireframe polygons.
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     glEnable(GL_DEPTH_TEST);
     //glEnable(GL_CULL_FACE);
@@ -189,7 +208,8 @@ void GLEngine::run() {
 
         for (int i = 0; i < 6; i++) {
             glBindBuffer(GL_ARRAY_BUFFER, buffer);
-            glBufferSubData(GL_ARRAY_BUFFER, 0, chunk.direction[i].size() * sizeof(glm::mat4), modelMatrices[i]);
+            //glBufferSubData(GL_ARRAY_BUFFER, 0, chunk.direction[i].size() * sizeof(glm::mat4), &chunk.direction[i]);
+            glBufferData(GL_ARRAY_BUFFER, chunk.direction[i].size() * sizeof(glm::mat4), &chunk.direction[i][0], GL_STATIC_DRAW);
             glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(sizeof(GLuint) * 6 * i), chunk.direction[i].size());
         }
 

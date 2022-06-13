@@ -9,7 +9,8 @@ void Mesh::generate_mesh() {
 		for (int row = 0; row < 16; row++) {
 			for (int col = 0; col < 16; col++) {
 				int index = (height * 16 * 16) + (row * 16) + col;
-				if (height < 1) {
+				//block_data[index] = distr(gen);
+				if (height < 2) {
 					block_data[index] = 1;
 				}
 				else {

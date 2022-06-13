@@ -7,6 +7,7 @@ Chunk::Chunk() {
 }
 
 void Chunk::build_face_data() {
+    glm::mat4 model = glm::mat4(1.0f);
     for (short height = 0; height < 256; height++) {
         for (short row = 0; row < 16; row++) {
             for (short col = 0; col < 16; col++) {
@@ -16,9 +17,11 @@ void Chunk::build_face_data() {
                 }
                 // Check neighbors for drawing faces
                 for (int i = 0; i < 6; i++) {
+                    model = glm::mat4(1.0f);
+                    model = glm::translate(glm::mat4(1.0), glm::vec3((float)col, (float)height, (float)row));
                     // If a block has a neighbor that is 'air' in a certain direction, calculate the position of the face.
                     if (mesh->get_neighbor(row, col, height, (Direction)i) == 0) {
-                        direction[i].emplace_back(glm::vec3((float)col - 16, (float)height, (float)row - 16));
+                        direction[i].emplace_back(model);
                     }
                 }
             }
