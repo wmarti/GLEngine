@@ -1,17 +1,11 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <stb_image.h>
+#include "common.h"
 
-#include <iostream>
-#include <cmath>
+#include <GLFW/glfw3.h>
 
 #include "gl_engine.h"
 #include "shader.h"
 #include "texture.h"
-#include "gen_chunk.h"
+#include "chunk.h"
 #include "timer.h"
 #include "camera.h"
 
@@ -20,7 +14,7 @@ glm::vec3 Y_AXIS = glm::vec3(0.0f, 1.0f, 0.0f);
 glm::vec3 Z_AXIS = glm::vec3(0.0f, 0.0f, 1.0f);
 
 // settings
-int width = 1920, height = 1080;
+int width = 2560, height = 1440;
 #ifdef __APPLE__
 width = 1280, height = 720;
 #endif
@@ -64,45 +58,15 @@ void GLEngine::init() {
     glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(_window, mouse_callback);
     glfwSetScrollCallback(_window, scroll_callback);
+
+
+
 }
 
 void GLEngine::run() {
     Shader _shaders("../shaders/shader.vert", "../shaders/shader.frag");
     Chunk chunk;
     chunk.build_face_data();
-    glm::mat4 model = glm::mat4(1.0f);
-    std::vector<std::vector<glm::mat4>> modelTransforms;
-    modelTransforms.resize(6);
-    //glm::mat4** modelMatrices = new glm::mat4 * [6];
-    //for (int i = 0; i < 6; i++) {
-    //    modelMatrices[i] = new glm::mat4[chunk.direction[i].size()];
-    //}
-    //int size = 0;
-    //for (int i = 0; i < 6; i++)
-    //    size += chunk.direction[i].size();
-    //
-    //glm::mat4* modelMatrices = new glm::mat4[size];
-    //int offset = 0;
-    //for (int i = 0; i < 6; i++) {
-    //    for (int j = 0; j < chunk.direction[i].size(); j++) {
-    //        model = glm::mat4(1.0f);
-    //        model = glm::translate(model, chunk.direction[i][j]);
-    //        /*modelMatrices[i][j] = model;*/
-    //        modelTransforms[i].emplace_back(model);
-    //        //modelMatrices[offset] = model;
-    //        offset++;
-    //    }
-    //}
-
-    std::vector<size_t> offsets = {
-        {0},
-        {chunk.direction[0].size()},
-        {chunk.direction[0].size() + chunk.direction[1].size()},
-        {chunk.direction[0].size() + chunk.direction[1].size() + chunk.direction[2].size()},
-        {chunk.direction[0].size() + chunk.direction[1].size() + chunk.direction[2].size() + chunk.direction[3].size()},
-        {chunk.direction[0].size() + chunk.direction[1].size() + chunk.direction[2].size() + chunk.direction[3].size() + chunk.direction[4].size()},
-        //{chunk.direction[0].size() + chunk.direction[1].size() + chunk.direction[2].size() + chunk.direction[3].size() + chunk.direction[4].size() + chunk.direction[5].size()}
-    };
 
     unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
@@ -140,22 +104,7 @@ void GLEngine::run() {
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glVertexAttribDivisor(2, 1);
-    //glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)0);
-    // vertex attributes
-    //std::size_t vec4Size = sizeof(glm::vec4);
-    //glEnableVertexAttribArray(3);
-    //glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)0);
-    //glEnableVertexAttribArray(4);
-    //glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(1 * vec4Size));
-    //glEnableVertexAttribArray(5);
-    //glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(2 * vec4Size));
-    //glEnableVertexAttribArray(6);
-    //glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(3 * vec4Size));
 
-    //glVertexAttribDivisor(3, 1);
-    //glVertexAttribDivisor(4, 1);
-    //glVertexAttribDivisor(5, 1);
-    //glVertexAttribDivisor(6, 1);
 
     glBindVertexArray(0);
 
@@ -170,7 +119,7 @@ void GLEngine::run() {
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
-
+    //glfwSwapInterval(0);
 
     while (!glfwWindowShouldClose(_window)) {
         glCullFace(GL_BACK);
@@ -181,7 +130,7 @@ void GLEngine::run() {
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        // Timer timer("Draw call");
+        Timer timer("Draw call");
         process_input(_window);
         // render
         // -----

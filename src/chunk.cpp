@@ -1,4 +1,4 @@
-#include "gen_chunk.h"
+#include "chunk.h"
 
 
 Chunk::Chunk() {

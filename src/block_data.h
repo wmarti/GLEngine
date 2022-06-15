@@ -1,9 +1,5 @@
 #pragma once
-#include <array>
-#include <vector>
-#include <random>
-
-#include <glm/glm.hpp>
+#include "common.h"
 
 enum Direction : char {
 	North,
@@ -23,11 +19,12 @@ enum MeshDimensions : int {
 
 class Mesh {
 public:
+	Mesh();
 	void generate_mesh();
-	void build_face_data();
 	int get_block(short row, short col, short height);
 	int get_neighbor(short row, short col, short height, Direction dir);
 
+	std::vector<char> block_data;
 
 	struct BlockCoordinate {
 		int row, col, height;
@@ -47,6 +44,4 @@ public:
 		BlockCoordinate( 0, 0, 1),
 		BlockCoordinate( 0, 0,-1)
 	};
-
-	std::vector<char> block_data;
 };

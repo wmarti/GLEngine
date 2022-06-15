@@ -1,7 +1,6 @@
 #pragma once
-#include "stb_image.h"
-#include <assert.h>
-#include <glad/glad.h>
+#include "common.h"
+
 class Texture {
 public:
     unsigned int texture;
