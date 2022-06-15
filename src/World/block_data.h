@@ -16,15 +16,18 @@ enum MeshDimensions : int {
 	HEIGHT_MAX = 255,
 };
 
-
 class Mesh {
 public:
 	Mesh();
 	void generate_mesh();
 	int get_block(short row, short col, short height);
 	int get_neighbor(short row, short col, short height, Direction dir);
+	void build_face_direction_data();
 
+	// Block information, for now just solid or air...
 	std::vector<char> block_data;
+	// Position information for each north, east, etc. face.
+	std::vector<std::vector<glm::vec3>> direction;
 
 	struct BlockCoordinate {
 		int row, col, height;

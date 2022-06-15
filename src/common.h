@@ -15,7 +15,12 @@
 
 
 // 3rd Party Library Includes
+// 
+// this is to force the formatter to keep the order, because glad must be included first
+#if 1
 #include <glad/glad.h>
+#endif
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>

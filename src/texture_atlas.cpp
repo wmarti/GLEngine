@@ -22,7 +22,7 @@ TextureAtlas::TextureAtlas(const char* filepath) {
         for (int ix = 0; ix < tilesX; ++ix)
         {
             unsigned char* ptr = image + iy * rowLen + ix * tileSizeX;
-            for (int row = 0; row < height; ++row)
+            for (int row = 0; row < tilesX; ++row)
                 std::copy(ptr + row * rowLen, ptr + row * rowLen + tileSizeX,
                     tile.begin() + row * tileSizeX);
 

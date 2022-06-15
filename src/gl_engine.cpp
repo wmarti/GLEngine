@@ -8,6 +8,7 @@
 #include "chunk.h"
 #include "timer.h"
 #include "camera.h"
+#include "texture_atlas.h"
 
 glm::vec3 X_AXIS = glm::vec3(1.0f, 0.0f, 0.0f);
 glm::vec3 Y_AXIS = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -30,6 +31,15 @@ float deltaTime = 0.0f;	// Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
 
 void GLEngine::init() {
+    setup_glfw_window();
+    compile_shaders();
+    load_texture_atlas();
+    build_chunks();
+    load_gpu_data();
+}
+
+void GLEngine::setup_glfw_window()
+{
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
@@ -59,14 +69,34 @@ void GLEngine::init() {
     glfwSetCursorPosCallback(_window, mouse_callback);
     glfwSetScrollCallback(_window, scroll_callback);
 
+    // uncomment this call to draw in wireframe polygons.
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    //glfwSwapInterval(0);
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CW);
+
+}
+
+void GLEngine::compile_shaders() {
+    _shaders = new Shader("../shaders/shader.vert", "../shaders/shader.frag");
+}
+
+void GLEngine::load_texture_atlas() {
+    _textureAtlas = new TextureAtlas("../assets/terrain.png");
+}
+
+void GLEngine::build_chunks() {
+    _chunk = new Chunk();
+}
+
+void GLEngine::load_gpu_data() {
 
 }
 
 void GLEngine::run() {
-    Shader _shaders("../shaders/shader.vert", "../shaders/shader.frag");
-    Chunk chunk;
-    chunk.build_face_data();
 
     unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
@@ -100,11 +130,10 @@ void GLEngine::run() {
     unsigned int buffer;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glBufferData(GL_ARRAY_BUFFER, chunk.direction[0].size() * sizeof(glm::vec3), &chunk.direction[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, _chunk->mesh->direction[0].size() * sizeof(glm::vec3), &_chunk->mesh->direction[0], GL_STATIC_DRAW);
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glVertexAttribDivisor(2, 1);
-
 
     glBindVertexArray(0);
 
@@ -112,18 +141,8 @@ void GLEngine::run() {
     Texture grass_top("../assets/mc_grass_top.jpeg");
     Texture dirt("../assets/mc_dirt.jpeg");
 
-    Block grass(&grass_top, &grass_side, &dirt);
-
-    // uncomment this call to draw in wireframe polygons.
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    //glfwSwapInterval(0);
-
     while (!glfwWindowShouldClose(_window)) {
-        glCullFace(GL_BACK);
-        glFrontFace(GL_CW);
+
         // per-frame time logic
         // --------------------
         float currentFrame = static_cast<float>(glfwGetTime());
@@ -140,7 +159,7 @@ void GLEngine::run() {
         //glClear(GL_COLOR_BUFFER_BIT);
         
         // draw our first triangle
-        _shaders.use();
+        _shaders->use();
 
         glm::mat4 trans = glm::mat4(1.0f);
 
@@ -149,20 +168,20 @@ void GLEngine::run() {
 
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)width / (float)height, 0.1f, 100.0f);
 
-        _shaders.setMat4("transform", trans);
-        _shaders.setMat4("view", view);
-        _shaders.setMat4("projection", projection);
+        _shaders->setMat4("transform", trans);
+        _shaders->setMat4("view", view);
+        _shaders->setMat4("projection", projection);
 
         glBindVertexArray(VAO);
 
         //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        chunk.draw_mesh(grass, _shaders);
+        //_chunk->draw_mesh(grass, *_shaders);
 
         for (int i = 0; i < 6; i++) {
             glBindBuffer(GL_ARRAY_BUFFER, buffer);
             //glBufferSubData(GL_ARRAY_BUFFER, 0, chunk.direction[i].size() * sizeof(glm::mat4), &chunk.direction[i]);
-            glBufferData(GL_ARRAY_BUFFER, chunk.direction[i].size() * sizeof(glm::vec3), &chunk.direction[i][0], GL_STATIC_DRAW);
-            glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(sizeof(GLuint) * 6 * i), chunk.direction[i].size());
+            glBufferData(GL_ARRAY_BUFFER, _chunk->mesh->direction[i].size() * sizeof(glm::vec3), &_chunk->mesh->direction[i][0], GL_STATIC_DRAW);
+            glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(sizeof(GLuint) * 6 * i), _chunk->mesh->direction[i].size());
         }
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
