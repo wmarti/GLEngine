@@ -4,18 +4,20 @@ Mesh::Mesh() {
 	// Reserve space for block face and direction data upon construction of a mesh.
 	block_data.resize(65536);
 	direction.resize(6);
+	texture_index.resize(65536);
 }
 
 void Mesh::generate_mesh() {
 	std::random_device rd; // obtain a random number from hardware
 	std::mt19937 gen(rd()); // seed the generator
 	std::uniform_int_distribution<> distr(0, 1); // define the range
-	
+	std::uniform_int_distribution<> distr_tex(0, 3); 
 	for (int height = 0; height < 256; height++) {
 		for (int row = 0; row < 16; row++) {
 			for (int col = 0; col < 16; col++) {
 				int index = (height * 16 * 16) + (row * 16) + col;
 				block_data[index] = distr(gen);
+				texture_index[index] = distr_tex(gen);
 			}
 		}
 	}

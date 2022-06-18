@@ -106,14 +106,13 @@ void GLEngine::run() {
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(face_triangles), face_triangles, GL_STATIC_DRAW);
-
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(face_triangles), face_triangles, GL_STATIC_DRAW);
 
     // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
     //glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -121,8 +120,8 @@ void GLEngine::run() {
 
 
     // texture coord attribute
-    //glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    //glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
 
     // configure instanced array
@@ -156,7 +155,6 @@ void GLEngine::run() {
         // draw();
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        //glClear(GL_COLOR_BUFFER_BIT);
         
         // draw our first triangle
         _shaders->use();
@@ -176,12 +174,20 @@ void GLEngine::run() {
 
         //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         //_chunk->draw_mesh(grass, *_shaders);
-
         for (int i = 0; i < 6; i++) {
+            if (i == 0 || i == 1 || i == 2 || i == 3) {
+                grass_side.bind();
+            }
+            else if (i == 4) {
+                grass_top.bind();
+            }
+            else {
+                dirt.bind();
+            }
             glBindBuffer(GL_ARRAY_BUFFER, buffer);
-            //glBufferSubData(GL_ARRAY_BUFFER, 0, chunk.direction[i].size() * sizeof(glm::mat4), &chunk.direction[i]);
             glBufferData(GL_ARRAY_BUFFER, _chunk->mesh->direction[i].size() * sizeof(glm::vec3), &_chunk->mesh->direction[i][0], GL_STATIC_DRAW);
-            glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(sizeof(GLuint) * 6 * i), _chunk->mesh->direction[i].size());
+            glDrawArraysInstanced(GL_TRIANGLES, i * 6, 6, _chunk->mesh->direction[i].size());
+            //glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(sizeof(GLuint) * 6 * i), _chunk->mesh->direction[i].size());
         }
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)

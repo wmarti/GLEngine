@@ -27,18 +27,18 @@
 #include <stb_image.h>
 
 // Block Vertex and Face orientation/positioning information
-static float vertices[24] = {
-    // x     y     z
+static float vertices[40] = {
+    // x     y     z      u     v
       //   back
-     -0.5, -0.5, -0.5, // bottom-left  0
-     -0.5,  0.5, -0.5, // top-left     1
-      0.5, -0.5, -0.5, // bottom-right 2
-      0.5,  0.5, -0.5, // top-right    3
-      //   front
-     -0.5, -0.5,  0.5, // bottom-left  4
-     -0.5,  0.5,  0.5, // top-left     5
-      0.5, -0.5,  0.5, // bottom-right 6
-      0.5,  0.5,  0.5, // top-right    7
+     -0.5, -0.5, -0.5,   0.0f, 0.0f, // bottom-left  0
+     -0.5,  0.5, -0.5,   0.0f, 1.0f, // top-left     1
+      0.5, -0.5, -0.5,   1.0f, 0.0f, // bottom-right 2
+      0.5,  0.5, -0.5,   1.0f, 1.0f, // top-right    3
+      //   front         
+     -0.5, -0.5,  0.5,   0.0f, 0.0f, // bottom-left  4
+     -0.5,  0.5,  0.5,   0.0f, 1.0f, // top-left     5
+      0.5, -0.5,  0.5,   1.0f, 0.0f, // bottom-right 6
+      0.5,  0.5,  0.5,   1.0f, 1.0f, // top-right    7
 };
 
 static unsigned int face_triangles[36] = {
@@ -60,4 +60,62 @@ static unsigned int face_triangles[36] = {
     // Down
       0, 4, 6, // CW
       0, 6, 2, // CW
+};
+
+
+static float cubeVertices[] = {
+    // Back face
+      0.5, -0.5, -0.5,   1.0f, 0.0f, // bottom-right 2
+      0.5,  0.5, -0.5,   1.0f, 1.0f, // top-right    3   
+     -0.5,  0.5, -0.5,   0.0f, 1.0f, // top-left     1
+      0.5, -0.5, -0.5,   1.0f, 0.0f, // bottom-right 2
+     -0.5,  0.5, -0.5,   0.0f, 1.0f, // top-left     1
+     -0.5, -0.5, -0.5,   0.0f, 0.0f, // bottom-left  0
+    // Right face
+      0.5, -0.5,  0.5,   0.0f, 0.0f, // bottom-right 6
+      0.5,  0.5,  0.5,   0.0f, 1.0f, // top-right    7
+      0.5,  0.5, -0.5,   1.0f, 1.0f, // top-right    3
+      0.5, -0.5,  0.5,   0.0f, 0.0f, // bottom-right 6
+      0.5,  0.5, -0.5,   1.0f, 1.0f, // top-right    3
+      0.5, -0.5, -0.5,   1.0f, 0.0f, // bottom-right 2
+    // Front face
+     -0.5, -0.5,  0.5,   0.0f, 0.0f, // bottom-left  4
+     -0.5,  0.5,  0.5,   0.0f, 1.0f, // top-left     5
+      0.5,  0.5,  0.5,   1.0f, 1.0f, // top-right    7
+     -0.5, -0.5,  0.5,   0.0f, 0.0f, // bottom-left  4
+      0.5,  0.5,  0.5,   1.0f, 1.0f, // top-right    7
+      0.5, -0.5,  0.5,   1.0f, 0.0f, // bottom-right 6
+    // Left face
+     -0.5, -0.5, -0.5,   0.0f, 0.0f, // bottom-left  0
+     -0.5,  0.5, -0.5,   0.0f, 1.0f, // top-left     1
+     -0.5,  0.5,  0.5,   1.0f, 1.0f, // top-left     5
+     -0.5, -0.5, -0.5,   0.0f, 0.0f, // bottom-left  0
+     -0.5,  0.5,  0.5,   1.0f, 1.0f, // top-left     5
+     -0.5, -0.5,  0.5,   1.0f, 0.0f, // bottom-left  4
+    // Top face
+     -0.5,  0.5,  0.5,   0.0f, 0.0f, // top-left     5
+     -0.5,  0.5, -0.5,   0.0f, 1.0f, // top-left     1
+      0.5,  0.5, -0.5,   1.0f, 1.0f, // top-right    3
+     -0.5,  0.5,  0.5,   0.0f, 0.0f, // top-left     5
+      0.5,  0.5, -0.5,   1.0f, 1.0f, // top-right    3
+      0.5,  0.5,  0.5,   1.0f, 0.0f, // top-right    7
+    // Bottom face          
+     -0.5, -0.5, -0.5,   0.0f, 0.0f, // bottom-left  0
+     -0.5, -0.5,  0.5,   0.0f, 1.0f, // bottom-left  4
+      0.5, -0.5,  0.5,   1.0f, 1.0f, // bottom-right 6
+     -0.5, -0.5, -0.5,   0.0f, 0.0f, // bottom-left  0
+      0.5, -0.5,  0.5,   1.0f, 1.0f, // bottom-right 6
+      0.5, -0.5, -0.5,   1.0f, 0.0f, // bottom-right 2
+};
+
+
+static float uv_coords[8] = {
+    0.0f, 0.0f, // bottom-left  0
+    0.0f, 1.0f, // top-left     1
+    1.0f, 0.0f, // bottom-right 2
+    1.0f, 1.0f, // top-right    3
+};
+
+static unsigned int uv_indices[24] = {
+    2,
 };

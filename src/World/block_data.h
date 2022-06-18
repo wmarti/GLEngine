@@ -28,6 +28,7 @@ public:
 	std::vector<char> block_data;
 	// Position information for each north, east, etc. face.
 	std::vector<std::vector<glm::vec3>> direction;
+	std::vector<unsigned char> texture_index;
 
 	struct BlockCoordinate {
 		int row, col, height;
