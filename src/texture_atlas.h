@@ -13,11 +13,11 @@ public:
 	
 	int tilesX = 16;
 	int tilesY = 16;
-	int imageCount = tilesX * tilesY;
+	int imageCount = 256;
 
 	std::vector<unsigned char> tile;
 
-	GLint internalFormat = GL_RGBA8;
+	GLint internalFormat = GL_RGB8;
 	GLenum imageFormat = GL_RGBA;
 
 };

@@ -5,14 +5,17 @@ the compiler will silently remove the variable from the compiled version
 which is the cause for several frustrating errors; keep this in mind!
 */
 
+
 //in vec4 vertexColor;
 in vec4 vertexPosition;
 in vec2 TexCoord;
 out vec4 FragColor;
 
-uniform sampler2D ourTexture;
+// uniform sampler2DArray atlas;
+// uniform sampler2D tex;
+uniform sampler2DArray textureArray;
+int layer = 1;
 
 void main() {
-    FragColor = texture(ourTexture, TexCoord);
-    // FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
+    FragColor = texture(textureArray, vec3(TexCoord, 241));
 }

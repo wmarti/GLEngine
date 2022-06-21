@@ -41,8 +41,8 @@ void GLEngine::init() {
 void GLEngine::setup_glfw_window()
 {
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -70,11 +70,11 @@ void GLEngine::setup_glfw_window()
     glfwSetScrollCallback(_window, scroll_callback);
 
     // uncomment this call to draw in wireframe polygons.
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
-    //glfwSwapInterval(0);
+    glfwSwapInterval(0);
     glCullFace(GL_BACK);
     glFrontFace(GL_CW);
 
@@ -86,6 +86,7 @@ void GLEngine::compile_shaders() {
 
 void GLEngine::load_texture_atlas() {
     _textureAtlas = new TextureAtlas("../assets/terrain.png");
+    _textureAtlas->Bind();
 }
 
 void GLEngine::build_chunks() {
@@ -93,11 +94,6 @@ void GLEngine::build_chunks() {
 }
 
 void GLEngine::load_gpu_data() {
-
-}
-
-void GLEngine::run() {
-
     unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -108,21 +104,13 @@ void GLEngine::run() {
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
 
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(face_triangles), face_triangles, GL_STATIC_DRAW);
-
     // position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    //glBindBuffer(GL_ARRAY_BUFFER, 0);
-    //glBindVertexArray(0);
-
-
     // texture coord attribute
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-
 
     // configure instanced array
     // -------------------------
@@ -133,12 +121,9 @@ void GLEngine::run() {
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glVertexAttribDivisor(2, 1);
+}
 
-    glBindVertexArray(0);
-
-    Texture grass_side("../assets/mc_grass.jpeg");
-    Texture grass_top("../assets/mc_grass_top.jpeg");
-    Texture dirt("../assets/mc_dirt.jpeg");
+void GLEngine::run() {
 
     while (!glfwWindowShouldClose(_window)) {
 
@@ -148,7 +133,7 @@ void GLEngine::run() {
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        Timer timer("Draw call");
+        //Timer timer("Draw call");
         process_input(_window);
         // render
         // -----
@@ -170,21 +155,8 @@ void GLEngine::run() {
         _shaders->setMat4("view", view);
         _shaders->setMat4("projection", projection);
 
-        glBindVertexArray(VAO);
-
-        //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        //_chunk->draw_mesh(grass, *_shaders);
         for (int i = 0; i < 6; i++) {
-            if (i == 0 || i == 1 || i == 2 || i == 3) {
-                grass_side.bind();
-            }
-            else if (i == 4) {
-                grass_top.bind();
-            }
-            else {
-                dirt.bind();
-            }
-            glBindBuffer(GL_ARRAY_BUFFER, buffer);
+            //glBindBuffer(GL_ARRAY_BUFFER, buffer);
             glBufferData(GL_ARRAY_BUFFER, _chunk->mesh->direction[i].size() * sizeof(glm::vec3), &_chunk->mesh->direction[i][0], GL_STATIC_DRAW);
             glDrawArraysInstanced(GL_TRIANGLES, i * 6, 6, _chunk->mesh->direction[i].size());
             //glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(sizeof(GLuint) * 6 * i), _chunk->mesh->direction[i].size());
