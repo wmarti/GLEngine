@@ -1,4 +1,5 @@
 #include "block_data.h"
+#include "block_data.h"
 
 Mesh::Mesh() {
 	// Reserve space for block face and direction data upon construction of a mesh.
@@ -23,24 +24,30 @@ void Mesh::generate_mesh() {
 	}
 }
 
-void Mesh::build_face_direction_data() {
+void Mesh::build_face_direction_data(short row, short col, short height) {
 	glm::mat4 model = glm::mat4(1.0f);
+	// If the block in the mesh is 'air', skip it.
+	if (get_block(row, col, height) == 0) {
+		return;
+	}
+	// Check neighbors for drawing faces
+	for (int i = 0; i < 6; i++) {
+		model = glm::mat4(1.0f);
+		model = glm::translate(glm::mat4(1.0), glm::vec3((float)col, (float)height, (float)row));
+		// If a block has a neighbor that is 'air' in a certain direction, we want to draw it,
+		// so calculate the position of the face.
+		if (get_neighbor(row, col, height, (Direction)i) == 0) {
+			direction[i].emplace_back(glm::vec3((float)col, (float)height - 256, (float)row));
+		}
+	}
+}
+
+void Mesh::generate_face_data() {
 	for (short height = 0; height < 256; height++) {
 		for (short row = 0; row < 16; row++) {
 			for (short col = 0; col < 16; col++) {
-				// If the block in the mesh is 'air', skip it.
-				if (get_block(row, col, height) == 0) {
-					continue;
-				}
-				// Check neighbors for drawing faces
-				for (int i = 0; i < 6; i++) {
-					model = glm::mat4(1.0f);
-					model = glm::translate(glm::mat4(1.0), glm::vec3((float)col, (float)height, (float)row));
-					// If a block has a neighbor that is 'air' in a certain direction, calculate the position of the face.
-					if (get_neighbor(row, col, height, (Direction)i) == 0) {
-						direction[i].emplace_back(glm::vec3((float)col, (float)height, (float)row));
-					}
-				}
+				build_face_direction_data(row, col, height);
+
 			}
 		}
 	}

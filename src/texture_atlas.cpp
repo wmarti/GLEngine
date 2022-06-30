@@ -1,8 +1,8 @@
 #include "texture_atlas.h"
 
 TextureAtlas::TextureAtlas(const char* filepath) {
-	// OpenGL has texture coordinates with (0, 0) on bottom
-	stbi_set_flip_vertically_on_load(true);
+	// OpenGL has texture coordinates with (0, 0) on bottom, but we'll flip the uv.y in the shader.
+	stbi_set_flip_vertically_on_load(false);
 	image = stbi_load(filepath, &width, &height, &channels, STBI_rgb_alpha);
 	assert(image != NULL);
 

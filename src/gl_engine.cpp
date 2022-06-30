@@ -77,7 +77,6 @@ void GLEngine::setup_glfw_window()
     glfwSwapInterval(0);
     glCullFace(GL_BACK);
     glFrontFace(GL_CW);
-
 }
 
 void GLEngine::compile_shaders() {
@@ -124,9 +123,7 @@ void GLEngine::load_gpu_data() {
 }
 
 void GLEngine::run() {
-
     while (!glfwWindowShouldClose(_window)) {
-
         // per-frame time logic
         // --------------------
         float currentFrame = static_cast<float>(glfwGetTime());
@@ -149,7 +146,7 @@ void GLEngine::run() {
         // Camera/view transformation
         glm::mat4 view = camera.GetViewMatrix();
 
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)width / (float)height, 0.1f, 100.0f);
+        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)width / (float)height, 0.1f, 300.0f);
 
         _shaders->setMat4("transform", trans);
         _shaders->setMat4("view", view);
@@ -170,6 +167,9 @@ void GLEngine::run() {
 }
 
 void GLEngine::cleanup() {
+    delete _chunk;
+    delete _textureAtlas;
+    delete _shaders;
     glfwTerminate();
 }
 

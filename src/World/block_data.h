@@ -22,7 +22,8 @@ public:
 	void generate_mesh();
 	int get_block(short row, short col, short height);
 	int get_neighbor(short row, short col, short height, Direction dir);
-	void build_face_direction_data();
+	void build_face_direction_data(short row, short col, short height);
+	void generate_face_data();
 
 	// Block information, for now just solid or air...
 	std::vector<char> block_data;
